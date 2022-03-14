@@ -16,8 +16,7 @@ dependencyResolutionManagement {
             credentials {
 
                 username = "78762447"
-                //You need to put your token to get access to remote library
-                password = ""
+                password = "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"
 
             }
         }

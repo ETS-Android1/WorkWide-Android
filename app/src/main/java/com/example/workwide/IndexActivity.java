@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.workwide.controlador.WebServices;
+import com.example.workwide.modelo.Trabajador;
 
 public class IndexActivity extends AppCompatActivity {
 
