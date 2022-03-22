@@ -29,12 +29,13 @@ import cz.msebera.android.httpclient.Header;
 
 public class LoginTabFragment extends Fragment implements View.OnClickListener {
 
-    EditText email, pass;
-    TextView text;
-    Button button;
-    String correo, contrasena;
-    SharedPreferences sesion;
-    WebServices SERVICES = new WebServices();
+    private EditText email, pass;
+    private TextView text;
+    private Button button;
+    private String correo, contrasena;
+    private SharedPreferences sesion;
+    private AsyncHttpClient cliente;
+    private RequestParams parametros;
 
     @Nullable
     @Override
@@ -72,7 +73,7 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
         if(id == button.getId()){
             Validacion validar = new Validacion();
             if(email.getText().toString().equals("") || email.getText().toString() == null){
-                Toast.makeText(getContext(), "Escribe un correo válido", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "El correo no puede estar vacío", Toast.LENGTH_SHORT).show();
             }
             else{
                 if(validar.validarCorreo(email.getText().toString())){
@@ -82,17 +83,63 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
                     }
                     else{
                         contrasena = pass.getText().toString();
-                        Trabajador user = SERVICES.iniciarSesion(correo, contrasena);
-                        while(user.getNombre().equals("Waiting...")){
-                            System.out.println("waiting...");
-                        }
-                        if(user.getIdUsu() != 0){
-                            System.out.println(user.getNombre() + " " + user.getApellido());
-                        }
-                        else{
-                            Toast.makeText(getContext(), "Los datos no coinciden", Toast.LENGTH_SHORT).show();
-                        }
+                        parametros = new RequestParams();
+                        Trabajador user = new Trabajador();
+                        //Colocamos los parametros a enviar
+                        parametros.put("correo", correo);
+                        parametros.put("contra", contrasena);
+
+                        //Inicializamos el cliente
+                        cliente = new AsyncHttpClient();
+
+                        //Mandamos la inforamción con post al web service establecido
+                        cliente.post("http://192.168.0.11:8080/WorkWide/iniciarAndroid", parametros, new JsonHttpResponseHandler(){
+                            @Override
+                            //Método que se ejecuta si se realizó con éxito
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                //Obtenemos la información del objeto JSON retornado
+                                try {
+                                    if(response.getInt("id") != 0){
+                                        //Guardamos la sesión del usuario
+                                        sesion = getContext().getSharedPreferences("SESION", Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sesion.edit();
+                                        editor.putString("nombre", response.getString("nombre"));
+                                        editor.putString("apellido",response.getString("apellido"));
+                                        editor.putString("correo", correo);
+                                        editor.putInt("tipo", response.getInt("tipo"));
+                                        editor.putInt("id", response.getInt("id"));
+                                        //Comrpobamos el tipo de usuario
+                                        if(response.getInt("tipo") == 2) {
+                                            if (response.getString("region").equals("")) {
+                                                editor.putString("region", "NA");
+                                                editor.putString("descripcion", "NA");
+                                                editor.putString("trabajo", "NA");
+                                                Toast.makeText(getContext(), "Completa el registro", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(getContext(), activity_compReg.class);
+                                                startActivity(intent);
+                                            } else {
+                                                editor.putString("region", response.getString("region"));
+                                                editor.putString("descripcion", response.getString("descripcion"));
+                                                editor.putString("trabajo", response.getString("trabajo"));
+                                            }
+                                        }
+                                        editor.apply();
+                                        Toast.makeText(getContext(), "SESIÓN CREADA, HOLA " + response.getString("nombre"), Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        user.setIdUsu(0);
+                                        user.setNombre("NA");
+                                        Toast.makeText(getContext(), "LAS CREDENCIALES NO COINCIDEN", Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
+                }
+                else{
+                    Toast.makeText(getContext(), "Escribe un correo electrónico válido", Toast.LENGTH_SHORT).show();
                 }
             }
         }

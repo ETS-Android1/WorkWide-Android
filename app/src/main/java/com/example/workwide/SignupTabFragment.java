@@ -1,5 +1,8 @@
 package com.example.workwide;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +20,16 @@ import androidx.fragment.app.Fragment;
 
 import com.example.workwide.modelo.Validacion;
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 public class SignupTabFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     Spinner userType;
@@ -31,6 +39,7 @@ public class SignupTabFragment extends Fragment implements View.OnClickListener,
     String nombreCad, apellidoCad, correoCad, contraCad, telefonoCad, tipo;
     private AsyncHttpClient cliente;
     private RequestParams parametros;
+    private SharedPreferences sesion;
 
     @Nullable
     @Override
@@ -65,34 +74,88 @@ public class SignupTabFragment extends Fragment implements View.OnClickListener,
             Validacion AUX = new Validacion();
             //Obtenemos los datos de cada campo
             nombreCad = nombre.getText().toString();
-            apellidoCad = nombre.getText().toString();
-            correoCad = nombre.getText().toString();
-            contraCad = nombre.getText().toString();
-            telefonoCad = nombre.getText().toString();
+            apellidoCad = apellido.getText().toString();
+            correoCad = correo.getText().toString();
+            contraCad = contra.getText().toString();
+            telefonoCad = telefono.getText().toString();
 
             //Validamos la longitud de los campos
-            if((nombreCad.length() < 3 || nombreCad.length() > 20) && (apellidoCad.length() < 3 || apellidoCad.length() > 20)
-            && (correoCad.length() < 8 || correoCad.length() > 40) && (contraCad.length() < 3 || contraCad.length() > 20)){
-                //Comprobamos el formato de los datos
-                if(AUX.validarNombre(nombreCad) && AUX.validarNombre(apellidoCad) && AUX.validarCorreo(correoCad)){
-                    //Comprobamos si el teléfono está vacío o si cumple el formato
-                    if(telefonoCad.length() > 0 || (telefonoCad.length() == 10 && AUX.validarTelefono(telefonoCad))) {
-                        parametros = new RequestParams();
-                        //Colocamos la información de registro en los parámetros
-                        parametros.put("nombre", nombreCad);
-                        parametros.put("apellido", apellidoCad);
-                        parametros.put("correo", correoCad);
-                        parametros.put("contra", contraCad);
-                        parametros.put("telefono", telefonoCad);
-                        parametros.put("tipo", tipo);
+            if(nombreCad.length() > 3 && nombreCad.length() < 20){
+                if (apellidoCad.length() > 3 && apellidoCad.length() < 20){
+                    if(correoCad.length() > 8 && correoCad.length() < 40){
+                        if (contraCad.length() > 3 && contraCad.length() < 20){
+                            //Comprobamos el formato de los datos
+                            if(AUX.validarNombre(nombreCad) && AUX.validarNombre(apellidoCad) && AUX.validarCorreo(correoCad)){
+                                //Comprobamos si el teléfono está vacío o si cumple el formato
+                                if(telefonoCad.length() == 0 || (telefonoCad.length() == 10 && AUX.validarTelefono(telefonoCad))) {
+                                    parametros = new RequestParams();
+                                    //Colocamos la información de registro en los parámetros
+                                    parametros.put("nombre", nombreCad);
+                                    parametros.put("apellido", apellidoCad);
+                                    parametros.put("correo", correoCad);
+                                    parametros.put("contra", contraCad);
+                                    parametros.put("telefono", telefonoCad);
+                                    parametros.put("tipo", tipo);
 
-                        //Inicializamos al cliente
-                        cliente = new SyncHttpClient();
+                                    //Inicializamos al cliente
+                                    cliente = new AsyncHttpClient();
+                                    cliente.post("http://192.168.0.11:8080/WorkWide/registroAndroid", parametros, new JsonHttpResponseHandler(){
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                            try{
+                                                int tipo = response.getInt("estado");
+                                                if(tipo != 0){
+                                                    sesion = getContext().getSharedPreferences("SESION", Context.MODE_PRIVATE);
+                                                    SharedPreferences.Editor editor = sesion.edit();
+                                                    editor.putString("nombre", nombreCad);
+                                                    editor.putString("apellido", apellidoCad);
+                                                    editor.putString("correo", correoCad);
+                                                    editor.putInt("id", response.getInt("id"));
+                                                    editor.putInt("tipo", tipo);
+                                                    if(tipo == 1){
+                                                        Toast.makeText(getContext(), "Bienvenido usuario", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    else{
+                                                        if(tipo == 2){
+                                                            Toast.makeText(getContext(), "Bienvenido trabajador, completa tu registro", Toast.LENGTH_SHORT).show();
+                                                            Intent intent = new Intent(getContext(), activity_compReg.class);
+                                                            startActivity(intent);
+                                                        }
+                                                    }
+                                                }
+                                                else{
+                                                    Toast.makeText(getContext(), "El correo " + correoCad + " ya está registrado", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                            catch(Exception e){
+
+                                            }
+
+                                        }
+                                    });
+                                }
+                                else{
+                                    Toast.makeText(getContext(), "El formato del teléfono es incorrecto", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            else{
+                                Toast.makeText(getContext(), "Comprueba el formato de los campos", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else{
+                            Toast.makeText(getContext(), "Escribe una longitud válida en la contraseña", Toast.LENGTH_SHORT).show();
+                        }
                     }
+                    else{
+                        Toast.makeText(getContext(), "Escribe una longitud válida en el correo", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else{
+                    Toast.makeText(getContext(), "Escribe una longitud válida en el apellido", Toast.LENGTH_SHORT).show();
                 }
             }
             else{
-                Toast.makeText(getContext(), "Alguns campos no tienen la longitud válida", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Escribe una longitud válida en el nombre", Toast.LENGTH_SHORT).show();
             }
         }
     }
