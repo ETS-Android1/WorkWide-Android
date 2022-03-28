@@ -1,8 +1,10 @@
 package com.example.workwide;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -18,29 +20,47 @@ import android.widget.Gallery;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.workwide.modelo.Validacion;
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpEntity;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class activity_compReg extends AppCompatActivity {
 
     private Spinner trabajo, region;
     private Button perfil, portada, completar;
     private EditText descripcion;
-    private String descripcionCad;
+    private String descripcionCad, regionCad, trabajoCad;
     private List<String> trabajosLista = new ArrayList<>();
     private List<String> regionLista = new ArrayList<>();
-    private AsyncHttpClient cliente;
-    private RequestParams parametros;
+    private OkHttpClient okcliente;
     private SharedPreferences sesion;
     private int trabajoPos = 0;
     private int regionPos = 0;
     private File perfilFile, portadaFile;
+
+    Validacion AUX = new Validacion();
 
 
     @Override
@@ -64,7 +84,36 @@ public class activity_compReg extends AppCompatActivity {
         ArrayAdapter<String> regionAdptr = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, regionLista);
 
         trabajo.setAdapter(trabajosAdptr);
+        trabajo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                trabajoPos = trabajo.getSelectedItemPosition();
+                trabajoCad = trabajo.getSelectedItem().toString();
+
+                System.out.println(trabajoPos + " " + trabajoCad);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         region.setAdapter(regionAdptr);
+        region.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                regionPos = region.getSelectedItemPosition();
+                regionCad = region.getSelectedItem().toString();
+
+                System.out.println(regionPos + " " + regionCad);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         perfil.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,31 +137,75 @@ public class activity_compReg extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 descripcionCad = descripcion.getText().toString();
-                trabajoPos = trabajo.getSelectedItemPosition();
-                regionPos = region.getSelectedItemPosition();
+                System.out.println(trabajoPos + " " + trabajoCad);
 
-                if(!descripcionCad.equals("")){
+                if(!descripcionCad.equals("") && !AUX.validarDesc(descripcionCad)){
                     if(trabajoPos != 0 && regionPos != 0){
-                            parametros = new RequestParams();
-                            try {
-                                parametros.put("perfil", perfilFile);
-                                parametros.put("portada", portadaFile);
-                                parametros.put("trabajo", trabajoPos);
-                                parametros.put("region", regionPos);
-                                parametros.put("descripcion", descripcionCad);
+                        sesion = getApplicationContext().getSharedPreferences("SESION", Context.MODE_PRIVATE);
+                        int id = sesion.getInt("id", 0);
+                        try {
+                            RequestBody params = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                                    .addFormDataPart(
+                                            "perfil",
+                                            perfilFile.getName(),
+                                            RequestBody.create(perfilFile, MediaType.parse("image/*")))
+                                    .addFormDataPart(
+                                            "portada",
+                                            portadaFile.getName(),
+                                            RequestBody.create(perfilFile, MediaType.parse("image/*")))
+                                    .addFormDataPart("trabajo", String.valueOf(trabajoPos))
+                                    .addFormDataPart("region", String.valueOf(regionPos))
+                                    .addFormDataPart("descripcion", descripcionCad)
+                                    .addFormDataPart("id", String.valueOf(id))
+                                    .build();
 
-                            } catch (FileNotFoundException e) {
-                                //Imprimimos los errores
-                                Toast.makeText(getApplicationContext(), "No se encontró el archivo", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
-                            }
+                            Request request = new Request.Builder()
+                                    .url("http://192.168.0.11:8080/WorkWide/completarAndroid")
+                                    .post(params)
+                                    .build();
+
+                            okcliente = new OkHttpClient();
+                            okcliente.newCall(request).enqueue(new Callback() {
+                                @Override
+                                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                @Override
+                                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                    String resp = response.toString();
+                                    if(response.isSuccessful()){
+                                        activity_compReg.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(getApplicationContext(), resp, Toast.LENGTH_SHORT).show();
+                                                completar.setEnabled(false);
+                                            }
+                                        });
+                                    }
+                                    else{
+                                        System.out.println("Ops...");
+                                        activity_compReg.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(getApplicationContext(), resp, Toast.LENGTH_SHORT).show();
+                                                completar.setEnabled(false);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Escoge un trabajo y una región válidos", Toast.LENGTH_SHORT).show();
                     }
                 }
                 else{
-                    Toast.makeText(getApplicationContext(), "La descripción no puede estar vacía", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Escribe una descripción válida", Toast.LENGTH_SHORT).show();
                 }
             }
         });

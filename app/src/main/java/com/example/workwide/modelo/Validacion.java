@@ -40,4 +40,17 @@ public class Validacion {
 
         return verificado;
     }
+
+    public boolean validarDesc(String s){
+        boolean verificado = false;
+        Pattern regexDesc = Pattern.compile("/(<([^>]+)>)/i");
+
+        Matcher comparador = regexDesc.matcher(s);
+
+        if(comparador.find()){
+            verificado = true;
+        }
+
+        return verificado;
+    }
 }

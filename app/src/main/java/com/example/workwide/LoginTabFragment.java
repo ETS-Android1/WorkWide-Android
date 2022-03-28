@@ -16,9 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.workwide.controlador.WebServices;
 import com.example.workwide.modelo.Trabajador;
-import com.example.workwide.modelo.Usuario;
 import com.loopj.android.http.*;
 import com.example.workwide.modelo.Validacion;
 

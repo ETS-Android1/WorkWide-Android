@@ -5,16 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.example.workwide.controlador.WebServices;
-import com.example.workwide.modelo.Trabajador;
 
 public class IndexActivity extends AppCompatActivity {
 
