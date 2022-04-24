@@ -136,6 +136,7 @@ public class activity_compReg extends AppCompatActivity {
         completar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                completar.setEnabled(false);
                 descripcionCad = descripcion.getText().toString();
                 System.out.println(trabajoPos + " " + trabajoCad);
 
@@ -152,7 +153,7 @@ public class activity_compReg extends AppCompatActivity {
                                     .addFormDataPart(
                                             "portada",
                                             portadaFile.getName(),
-                                            RequestBody.create(perfilFile, MediaType.parse("image/*")))
+                                            RequestBody.create(portadaFile, MediaType.parse("image/*")))
                                     .addFormDataPart("trabajo", String.valueOf(trabajoPos))
                                     .addFormDataPart("region", String.valueOf(regionPos))
                                     .addFormDataPart("descripcion", descripcionCad)
@@ -169,6 +170,7 @@ public class activity_compReg extends AppCompatActivity {
                                 @Override
                                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                                     e.printStackTrace();
+                                    completar.setEnabled(true);
                                 }
 
                                 @Override
@@ -179,7 +181,14 @@ public class activity_compReg extends AppCompatActivity {
                                             @Override
                                             public void run() {
                                                 Toast.makeText(getApplicationContext(), resp, Toast.LENGTH_SHORT).show();
-                                                completar.setEnabled(false);
+                                                SharedPreferences.Editor editor = sesion.edit();
+                                                editor.putString("trabajo", trabajoCad);
+                                                editor.putString("region", regionCad);
+                                                editor.putString("descripcion", descripcionCad);
+                                                editor.apply();
+
+                                                Intent intent = new Intent(getApplicationContext(), activity_profileIndex.class);
+                                                startActivity(intent);
                                             }
                                         });
                                     }
@@ -189,7 +198,7 @@ public class activity_compReg extends AppCompatActivity {
                                             @Override
                                             public void run() {
                                                 Toast.makeText(getApplicationContext(), resp, Toast.LENGTH_SHORT).show();
-                                                completar.setEnabled(false);
+                                                completar.setEnabled(true);
                                             }
                                         });
                                     }

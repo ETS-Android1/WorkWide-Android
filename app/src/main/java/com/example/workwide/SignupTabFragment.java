@@ -114,6 +114,8 @@ public class SignupTabFragment extends Fragment implements View.OnClickListener,
                                                     editor.putInt("tipo", tipo);
                                                     if(tipo == 1){
                                                         Toast.makeText(getContext(), "Bienvenido usuario", Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(getContext(), activity_profileIndex.class);
+                                                        startActivity(intent);
                                                     }
                                                     else{
                                                         if(tipo == 2){

@@ -28,7 +28,7 @@ import cz.msebera.android.httpclient.Header;
 public class LoginTabFragment extends Fragment implements View.OnClickListener {
 
     private EditText email, pass;
-    private TextView text;
+    private TextView text, text_recovery;
     private Button button;
     private String correo, contrasena;
     private SharedPreferences sesion;
@@ -43,23 +43,28 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
         email = root.findViewById(R.id.email);
         pass = root.findViewById(R.id.pass);
         text = root.findViewById(R.id.text);
+        text_recovery = root.findViewById(R.id.text_recovery);
         button = root.findViewById(R.id.login);
 
         button.setOnClickListener(this);
+        text_recovery.setOnClickListener(this);
 
         email.setTranslationX(800);
         pass.setTranslationX(800);
         text.setTranslationX(800);
+        text_recovery.setTranslationX(800);
         button.setTranslationX(800);
 
         email.setAlpha(0);
         pass.setAlpha(0);
         text.setAlpha(0);
+        text_recovery.setAlpha(0);
         button.setAlpha(0);
 
         email.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(300).start();
         pass.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(500).start();
         text.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(500).start();
+        text_recovery.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(500).start();
         button.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(700).start();
 
         return root;
@@ -119,10 +124,13 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
                                                 editor.putString("region", response.getString("region"));
                                                 editor.putString("descripcion", response.getString("descripcion"));
                                                 editor.putString("trabajo", response.getString("trabajo"));
+
                                             }
                                         }
                                         editor.apply();
                                         Toast.makeText(getContext(), "SESIÓN CREADA, HOLA " + response.getString("nombre"), Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(getContext(), activity_profileIndex.class);
+                                        startActivity(intent);
                                     }
                                     else{
                                         user.setIdUsu(0);
@@ -139,6 +147,11 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
                 else{
                     Toast.makeText(getContext(), "Escribe un correo electrónico válido", Toast.LENGTH_SHORT).show();
                 }
+            }
+        }
+        else{
+            if(id == text_recovery.getId()){
+
             }
         }
     }
