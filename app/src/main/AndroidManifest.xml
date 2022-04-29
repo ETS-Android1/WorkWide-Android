@@ -17,6 +17,15 @@
         android:theme="@style/Theme.WorkWide"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".recovery_3"
+            android:exported="true" />
+        <activity
+            android:name=".recovery_2"
+            android:exported="true" />
+        <activity
+            android:name=".recovery_1"
+            android:exported="true" />
+        <activity
             android:name=".edit_user"
             android:exported="true" />
         <activity

@@ -75,6 +75,8 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
         int id = view.getId();
         if(id == button.getId()){
             Validacion validar = new Validacion();
+            button.setEnabled(false);
+
             if(email.getText().toString().equals("") || email.getText().toString() == null){
                 Toast.makeText(getContext(), "El correo no puede estar vacío", Toast.LENGTH_SHORT).show();
             }
@@ -148,10 +150,13 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(), "Escribe un correo electrónico válido", Toast.LENGTH_SHORT).show();
                 }
             }
+
+            button.setEnabled(true);
         }
         else{
             if(id == text_recovery.getId()){
-
+                Intent intent = new Intent(getContext(), recovery_1.class);
+                startActivity(intent);
             }
         }
     }
