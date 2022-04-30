@@ -34,10 +34,10 @@ public class IndexActivity extends AppCompatActivity {
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
-        splashImg.animate().translationY(-2300).setDuration(1000).setStartDelay(4000);
-        logo.animate().translationY(1800).setDuration(1000).setStartDelay(4000);
-        appName.animate().translationY(1400).setDuration(1000).setStartDelay(4000);
-        lottieAnimationView.animate().translationY(1400).setDuration(1000).setStartDelay(4000);
+        splashImg.animate().translationY(-2500).setDuration(1000).setStartDelay(4000);
+        logo.animate().translationY(2000).setDuration(1000).setStartDelay(4000);
+        appName.animate().translationY(1600).setDuration(1000).setStartDelay(4000);
+        lottieAnimationView.animate().translationY(1600).setDuration(1000).setStartDelay(4000);
 
     }
 
