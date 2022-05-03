@@ -75,6 +75,8 @@ public class delete_profile extends AppCompatActivity {
                                         Toast.makeText(getApplicationContext(), "Cuenta eliminada", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(getApplicationContext(), IndexActivity.class);
                                         startActivity(intent);
+
+                                        finish();
                                     }
                                     else{
                                         Toast.makeText(getApplicationContext(), "La contraseña es incorrecta", Toast.LENGTH_SHORT).show();

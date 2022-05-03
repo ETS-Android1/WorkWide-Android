@@ -132,5 +132,7 @@ public class activity_profileIndex extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getApplicationContext(), IndexActivity.class);
         startActivity(intent);
+
+        finish();
     }
 }

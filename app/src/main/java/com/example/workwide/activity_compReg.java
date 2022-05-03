@@ -189,6 +189,8 @@ public class activity_compReg extends AppCompatActivity {
 
                                                 Intent intent = new Intent(getApplicationContext(), activity_profileIndex.class);
                                                 startActivity(intent);
+
+                                                finish();
                                             }
                                         });
                                     }
@@ -207,6 +209,7 @@ public class activity_compReg extends AppCompatActivity {
 
                         } catch (Exception e) {
                             e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Escoge una foto de perfil y de portada", Toast.LENGTH_SHORT).show();
                         }
                     }
                     else{

@@ -157,6 +157,8 @@ public class LoginTabFragment extends Fragment implements View.OnClickListener {
             if(id == text_recovery.getId()){
                 Intent intent = new Intent(getContext(), recovery_1.class);
                 startActivity(intent);
+
+                getActivity().finish();
             }
         }
     }

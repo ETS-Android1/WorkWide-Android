@@ -63,6 +63,7 @@
         android:layout_height="wrap_content"
         android:hint="Teléfono"
         android:background="@drawable/edit_text_bg"
+        android:inputType="number"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"

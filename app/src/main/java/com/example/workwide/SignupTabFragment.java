@@ -122,6 +122,8 @@ public class SignupTabFragment extends Fragment implements View.OnClickListener,
                                                             Toast.makeText(getContext(), "Bienvenido trabajador, completa tu registro", Toast.LENGTH_SHORT).show();
                                                             Intent intent = new Intent(getContext(), activity_compReg.class);
                                                             startActivity(intent);
+
+                                                            getActivity().finish();
                                                         }
                                                     }
                                                 }
