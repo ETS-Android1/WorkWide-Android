@@ -17,6 +17,12 @@
         android:theme="@style/Theme.WorkWide"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".solicitudes"
+            android:exported="true" />
+        <activity
+            android:name=".trabajos"
+            android:exported="true" />
+        <activity
             android:name=".recovery_3"
             android:exported="true" />
         <activity

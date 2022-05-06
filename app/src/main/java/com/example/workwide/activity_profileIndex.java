@@ -94,6 +94,38 @@ public class activity_profileIndex extends AppCompatActivity {
             }
         });
 
+        work_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), trabajos.class);
+                startActivity(intent);
+            }
+        });
+
+        work_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), trabajos.class);
+                startActivity(intent);
+            }
+        });
+
+        request_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), solicitudes.class);
+                startActivity(intent);
+            }
+        });
+
+        request_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), solicitudes.class);
+                startActivity(intent);
+            }
+        });
+
         //Configurar perfil
         config_icon.setOnClickListener(new View.OnClickListener() {
             @Override
